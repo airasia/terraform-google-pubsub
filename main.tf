@@ -8,11 +8,11 @@ provider "google" {
 }
 
 locals {
-  topic_name = format("%s-%s", var.topic_name, var.tf_env)
+  topic_name = format("%s-%s", var.topic_name, var.name_suffix)
   push_subscriptions = [
     for subscription in var.push_subscriptions :
     {
-      name                       = format("%s-%s-push-%s", var.topic_name, subscription.name, var.tf_env)
+      name                       = format("%s-%s-push-%s", var.topic_name, subscription.name, var.name_suffix)
       push_endpoint              = subscription.push_endpoint
       ack_deadline_seconds       = lookup(subscription, "ack_deadline_seconds", var.default_ack_deadline_seconds)
       message_retention_duration = lookup(subscription, "message_retention_duration", var.default_message_retention_duration)
@@ -21,7 +21,7 @@ locals {
   pull_subscriptions = [
     for subscription in var.pull_subscriptions :
     {
-      name                       = format("%s-%s-pull-%s", var.topic_name, subscription.name, var.tf_env)
+      name                       = format("%s-%s-pull-%s", var.topic_name, subscription.name, var.name_suffix)
       ack_deadline_seconds       = lookup(subscription, "ack_deadline_seconds", var.default_ack_deadline_seconds)
       message_retention_duration = lookup(subscription, "message_retention_duration", var.default_message_retention_duration)
     }
