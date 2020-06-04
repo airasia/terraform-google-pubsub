@@ -3,5 +3,6 @@ output "usage_IAM_roles" {
   value = [
     "roles/pubsub.publisher",
     "roles/pubsub.subscriber",
+    "roles/pubsub.viewer",
   ]
 }
