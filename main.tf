@@ -7,7 +7,10 @@ provider "google" {
   version = ">= 3.13.0" # see https://github.com/terraform-providers/terraform-provider-google/releases
 }
 
+data "google_project" "project" {}
+
 locals {
+  google_pubsub_sa_email = "service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
   topic_name = format("%s-%s", var.topic_name, var.name_suffix)
   push_subscriptions = [
     for subscription in var.push_subscriptions :
@@ -67,4 +70,13 @@ resource "google_pubsub_subscription" "pull_subscriptions" {
   ack_deadline_seconds       = local.pull_subscriptions[count.index]["ack_deadline_seconds"]
   message_retention_duration = local.pull_subscriptions[count.index]["message_retention_duration"]
   depends_on                 = [google_project_service.pubsub_api]
+}
+
+resource "google_project_iam_member" "gcp_pubsub_role" {
+  # GCP requires the iam.serviceAccountTokenCreator role to be granted
+  # on a special ServiceAccount maintained by GCP for PubSub push authentication to work.
+  # See https://cloud.google.com/pubsub/docs/push#setting_up_for_push_authentication
+  role       = "roles/iam.serviceAccountTokenCreator"
+  member     = "serviceAccount:${local.google_pubsub_sa_email}"
+  depends_on = [google_project_service.pubsub_api]
 }
