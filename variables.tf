@@ -33,7 +33,7 @@ variable "pull_subscriptions" {
 # ----------------------------------------------------------------------------------------------------------------------
 
 variable "default_ack_deadline_seconds" {
-  description = "Default ackDeadline (in seconds) which will be used if such is not defined by the subscriptions."
+  description = "Sets default value (in seconds) for maximum time before which subsribers should acknowledge a received message. Current default = 10 seconds."
   type        = number
   default     = 10
   validation {
@@ -43,7 +43,7 @@ variable "default_ack_deadline_seconds" {
 }
 
 variable "default_message_retention_duration" {
-  description = "Default message retention duration (in seconds) which will be used if such is not defined by the subscriptions. Default '604800s' = 7 days."
+  description = "Sets default value (in seconds) for how long should unacknowledged messages be retained by PubSub. Current default '604800s' = 7 days."
   type        = string
   default     = "604800s"
 }
