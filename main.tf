@@ -58,7 +58,3 @@ resource "google_pubsub_subscription" "pull_subscriptions" {
   message_retention_duration = local.pull_subscriptions[count.index]["message_retention_duration"]
   depends_on                 = [google_project_service.pubsub_api]
 }
-
-# stripped down from https://github.com/terraform-google-modules/terraform-google-pubsub/blob/v1.2.1/main.tf
-# becuase its current use of google_pubsub_subscription.push_subscriptions.push_config.attributes is faulty
-# --- it keeps getting planned for & keeps getting applied even if it is already applied
