@@ -11,7 +11,7 @@ data "google_project" "project" {}
 
 locals {
   google_pubsub_sa_email = "service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
-  topic_name = format("%s-%s", var.topic_name, var.name_suffix)
+  topic_name             = format("%s-%s", var.topic_name, var.name_suffix)
   push_subscriptions = [
     for subscription in var.push_subscriptions :
     {
