@@ -13,6 +13,7 @@ push_subscriptions = [
     auth_audience              = "A case-insensitive string that can be used to validate intended audience"
     ack_deadline_seconds       = "Overrides 'var.default_ack_deadline_seconds' for this subscriber"
     message_retention_duration = "Overrides 'var.default_message_retention_duration' for this subscriber"
+    expiry_ttl                 = "Overrides 'var.default_expiry_ttl' for this subscriber"
   }
 ]
 ```
@@ -28,6 +29,7 @@ pull_subscriptions = [
     name                       = "Just any name"
     ack_deadline_seconds       = "Overrides 'var.default_ack_deadline_seconds' for this subscriber"
     message_retention_duration = "Overrides 'var.default_message_retention_duration' for this subscriber"
+    expiry_ttl                 = "Overrides 'var.default_expiry_ttl' for this subscriber"
   }
 ]
 ```
