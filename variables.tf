@@ -17,13 +17,13 @@ variable "topic_name" {
 }
 
 variable "push_subscriptions" {
-  description = "List of the push subscriptions (if any)."
+  description = "List of push subscriptions (if any) with key-value configurations. See source code for accepted keys of the configuration."
   type        = list(map(string))
   default     = []
 }
 
 variable "pull_subscriptions" {
-  description = "List of the pull subscriptions (if any)."
+  description = "List of pull subscriptions (if any) with key-value configurations. See source code for accepted keys of the configuration."
   type        = list(map(string))
   default     = []
 }
