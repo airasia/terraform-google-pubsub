@@ -73,7 +73,7 @@ resource "google_pubsub_subscription" "pull_subscriptions" {
   ack_deadline_seconds       = local.pull_subscriptions[count.index]["ack_deadline_seconds"]
   message_retention_duration = local.pull_subscriptions[count.index]["message_retention_duration"]
   expiration_policy { ttl = local.pull_subscriptions[count.index]["expiry_ttl"] }
-  depends_on                 = [google_project_service.pubsub_api]
+  depends_on = [google_project_service.pubsub_api]
 }
 
 resource "google_project_iam_member" "gcp_pubsub_role" {
