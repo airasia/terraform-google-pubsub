@@ -47,3 +47,9 @@ variable "default_message_retention_duration" {
   type        = string
   default     = "604800s"
 }
+
+variable "default_expiry_ttl" {
+  description = "Sets default value (in seconds) for how long after the last activity on a subscription should that subscription be removed. Current default '604800s' = 7 days. Use empty string \"\" for it to never expire by default."
+  type        = string
+  default     = "604800s"
+}

@@ -21,6 +21,7 @@ locals {
       auth_audience              = lookup(subscription, "auth_audience", null)
       ack_deadline_seconds       = lookup(subscription, "ack_deadline_seconds", var.default_ack_deadline_seconds)
       message_retention_duration = lookup(subscription, "message_retention_duration", var.default_message_retention_duration)
+      expiry_ttl                 = lookup(subscription, "expiry_ttl", var.default_expiry_ttl)
     }
   ]
   pull_subscriptions = [
@@ -29,6 +30,7 @@ locals {
       name                       = format("%s-%s-pull-%s", var.topic_name, subscription.name, var.name_suffix)
       ack_deadline_seconds       = lookup(subscription, "ack_deadline_seconds", var.default_ack_deadline_seconds)
       message_retention_duration = lookup(subscription, "message_retention_duration", var.default_message_retention_duration)
+      expiry_ttl                 = lookup(subscription, "expiry_ttl", var.default_expiry_ttl)
     }
   ]
 }
@@ -60,6 +62,7 @@ resource "google_pubsub_subscription" "push_subscriptions" {
       }
     }
   }
+  expiration_policy { ttl = local.push_subscriptions[count.index]["expiry_ttl"] }
   depends_on = [google_project_service.pubsub_api]
 }
 
@@ -69,6 +72,7 @@ resource "google_pubsub_subscription" "pull_subscriptions" {
   topic                      = google_pubsub_topic.topic.name
   ack_deadline_seconds       = local.pull_subscriptions[count.index]["ack_deadline_seconds"]
   message_retention_duration = local.pull_subscriptions[count.index]["message_retention_duration"]
+  expiration_policy { ttl = local.pull_subscriptions[count.index]["expiry_ttl"] }
   depends_on                 = [google_project_service.pubsub_api]
 }
 
