@@ -6,6 +6,7 @@ data "google_project" "project" {}
 
 locals {
   google_pubsub_sa_email = "service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+  default_expiry_ttl     = var.default_expiry_ttl == "NEVER" ? "" : var.default_expiry_ttl
   topic_name             = format("%s-%s", var.topic_name, var.name_suffix)
   push_subscriptions = [
     for subscription in var.push_subscriptions :
@@ -16,7 +17,7 @@ locals {
       auth_audience              = lookup(subscription, "auth_audience", null)
       ack_deadline_seconds       = lookup(subscription, "ack_deadline_seconds", var.default_ack_deadline_seconds)
       message_retention_duration = lookup(subscription, "message_retention_duration", var.default_message_retention_duration)
-      expiry_ttl                 = lookup(subscription, "expiry_ttl", var.default_expiry_ttl)
+      expiry_ttl                 = lookup(subscription, "expiry_ttl", local.default_expiry_ttl)
     }
   ]
   pull_subscriptions = [
@@ -25,7 +26,7 @@ locals {
       name                       = format("%s-%s-pull-%s", var.topic_name, subscription.name, var.name_suffix)
       ack_deadline_seconds       = lookup(subscription, "ack_deadline_seconds", var.default_ack_deadline_seconds)
       message_retention_duration = lookup(subscription, "message_retention_duration", var.default_message_retention_duration)
-      expiry_ttl                 = lookup(subscription, "expiry_ttl", var.default_expiry_ttl)
+      expiry_ttl                 = lookup(subscription, "expiry_ttl", local.default_expiry_ttl)
     }
   ]
 }
