@@ -32,6 +32,16 @@ variable "pull_subscriptions" {
 # OPTIONAL PARAMETERS
 # ----------------------------------------------------------------------------------------------------------------------
 
+variable "default_dead_letter_max_attempts" {
+  description = "Sets default count for maximum number of delivery attempts that a subscription may make to its dead-letter topic. Current default = 5. Maximum 100."
+  type        = number
+  default     = 5
+  validation {
+    condition     = (var.default_dead_letter_max_attempts >= 5) && (var.default_dead_letter_max_attempts <= 100)
+    error_message = "Must be an integer between 5 to 100."
+  }
+}
+
 variable "default_ack_deadline_seconds" {
   description = "Sets default value (in seconds) for maximum time before which subsribers should acknowledge a received message. Current default = 10 seconds."
   type        = number
