@@ -6,3 +6,8 @@ output "usage_IAM_roles" {
     "roles/pubsub.viewer",
   ]
 }
+
+output "topic_id" {
+  description = "An identifier of the topic with format projects/{{project}}/topics/{{name}}"
+  value       = google_pubsub_topic.topic.id
+}
