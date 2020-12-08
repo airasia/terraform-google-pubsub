@@ -72,7 +72,7 @@ resource "google_pubsub_subscription" "pull_subscriptions" {
   depends_on = [google_project_service.pubsub_api]
 }
 
-resource "google_project_iam_member" "gcp_pubsub_role" {
+resource "google_project_iam_member" "pubsub_sa_create_oidc_token" {
   # GCP requires the iam.serviceAccountTokenCreator role to be granted
   # on a special ServiceAccount maintained by GCP for PubSub push authentication to work.
   # See https://cloud.google.com/pubsub/docs/push#setting_up_for_push_authentication
