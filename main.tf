@@ -15,6 +15,8 @@ locals {
       push_endpoint              = subscription.push_endpoint
       auth_sa_email              = lookup(subscription, "auth_sa_email", null)
       auth_audience              = lookup(subscription, "auth_audience", null)
+      dead_letter_topic          = lookup(subscription, "dead_letter_topic", null)
+      dead_letter_max_attempts   = lookup(subscription, "dead_letter_max_attempts", var.default_dead_letter_max_attempts)
       ack_deadline_seconds       = lookup(subscription, "ack_deadline_seconds", var.default_ack_deadline_seconds)
       message_retention_duration = lookup(subscription, "message_retention_duration", var.default_message_retention_duration)
       expiry_ttl                 = lookup(subscription, "expiry_ttl", local.default_expiry_ttl)
@@ -47,6 +49,13 @@ resource "google_pubsub_subscription" "push_subscriptions" {
   topic                      = google_pubsub_topic.topic.name
   ack_deadline_seconds       = local.push_subscriptions[count.index]["ack_deadline_seconds"]
   message_retention_duration = local.push_subscriptions[count.index]["message_retention_duration"]
+  dynamic "dead_letter_policy" {
+    for_each = local.push_subscriptions[count.index]["dead_letter_topic"] == null ? [] : [1]
+    content {
+      dead_letter_topic     = local.push_subscriptions[count.index]["dead_letter_topic"]
+      max_delivery_attempts = local.push_subscriptions[count.index]["dead_letter_max_attempts"]
+    }
+  }
   push_config {
     push_endpoint = local.push_subscriptions[count.index]["push_endpoint"]
     dynamic "oidc_token" {
@@ -77,6 +86,20 @@ resource "google_project_iam_member" "pubsub_sa_create_oidc_token" {
   # on a special ServiceAccount maintained by GCP for PubSub push authentication to work.
   # See https://cloud.google.com/pubsub/docs/push#setting_up_for_push_authentication
   role       = "roles/iam.serviceAccountTokenCreator"
+  member     = "serviceAccount:${local.google_pubsub_sa_email}"
+  depends_on = [google_project_service.pubsub_api]
+}
+
+# See https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/pubsub_subscription#dead_letter_policy
+resource "google_project_iam_member" "pubsub_sa_acknowledge_for_dead_letter" {
+  role       = "roles/pubsub.subscriber"
+  member     = "serviceAccount:${local.google_pubsub_sa_email}"
+  depends_on = [google_project_service.pubsub_api]
+}
+
+# See https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/pubsub_subscription#dead_letter_topic
+resource "google_project_iam_member" "pubsub_sa_publish_to_dead_letter" {
+  role       = "roles/pubsub.publisher"
   member     = "serviceAccount:${local.google_pubsub_sa_email}"
   depends_on = [google_project_service.pubsub_api]
 }
