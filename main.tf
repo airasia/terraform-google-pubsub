@@ -20,6 +20,7 @@ locals {
       ack_deadline_seconds       = lookup(subscription, "ack_deadline_seconds", var.default_ack_deadline_seconds)
       message_retention_duration = lookup(subscription, "message_retention_duration", var.default_message_retention_duration)
       expiry_ttl                 = lookup(subscription, "expiry_ttl", local.default_expiry_ttl)
+      filter                     = lookup(subscription, "filter", "")
     }
   ]
   pull_subscriptions = [
@@ -29,6 +30,7 @@ locals {
       ack_deadline_seconds       = lookup(subscription, "ack_deadline_seconds", var.default_ack_deadline_seconds)
       message_retention_duration = lookup(subscription, "message_retention_duration", var.default_message_retention_duration)
       expiry_ttl                 = lookup(subscription, "expiry_ttl", local.default_expiry_ttl)
+      filter                     = lookup(subscription, "filter", "")
     }
   ]
 }
@@ -49,6 +51,7 @@ resource "google_pubsub_subscription" "push_subscriptions" {
   topic                      = google_pubsub_topic.topic.name
   ack_deadline_seconds       = local.push_subscriptions[count.index]["ack_deadline_seconds"]
   message_retention_duration = local.push_subscriptions[count.index]["message_retention_duration"]
+  filter                     = local.push_subscriptions[count.index].filter
   dynamic "dead_letter_policy" {
     for_each = local.push_subscriptions[count.index]["dead_letter_topic"] == null ? [] : [1]
     content {
@@ -77,6 +80,7 @@ resource "google_pubsub_subscription" "pull_subscriptions" {
   topic                      = google_pubsub_topic.topic.name
   ack_deadline_seconds       = local.pull_subscriptions[count.index]["ack_deadline_seconds"]
   message_retention_duration = local.pull_subscriptions[count.index]["message_retention_duration"]
+  filter                     = local.pull_subscriptions[count.index].filter
   expiration_policy { ttl = local.pull_subscriptions[count.index]["expiry_ttl"] }
   depends_on = [google_project_service.pubsub_api]
 }
