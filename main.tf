@@ -31,6 +31,8 @@ locals {
       message_retention_duration = lookup(subscription, "message_retention_duration", var.default_message_retention_duration)
       expiry_ttl                 = lookup(subscription, "expiry_ttl", local.default_expiry_ttl)
       filter                     = lookup(subscription, "filter", "")
+      minimum_backoff            = lookup(subscription, "minimum_backoff", var.default_minimum_backoff)
+      maximum_backoff            = lookup(subscription, "maximum_backoff", var.default_maximum_backoff)
     }
   ]
 }
@@ -82,6 +84,10 @@ resource "google_pubsub_subscription" "pull_subscriptions" {
   message_retention_duration = local.pull_subscriptions[count.index]["message_retention_duration"]
   filter                     = local.pull_subscriptions[count.index].filter
   expiration_policy { ttl = local.pull_subscriptions[count.index]["expiry_ttl"] }
+  retry_policy {
+    minimum_backoff = local.pull_subscriptions[count.index]["minimum_backoff"]
+    maximum_backoff = local.pull_subscriptions[count.index]["maximum_backoff"]
+  }
   depends_on = [google_project_service.pubsub_api]
 }
 

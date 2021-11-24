@@ -63,3 +63,23 @@ variable "default_expiry_ttl" {
   type        = string
   default     = "604800s"
 }
+
+variable "default_minimum_backoff" {
+  description = "Sets default value (in seconds) for minimum delay between consecutive deliveries of a given message. Current default '10 seconds'. "
+  type        = number
+  default     = 10
+  validation {
+    condition     = (var.default_minimum_backoff >= 0) && (var.default_minimum_backoff <= 600)
+    error_message = "Must be an integer between 0 to 600."
+  }
+}
+
+variable "default_maximum_backoff" {
+  description = "Sets default value (in seconds) for maximum delay between consecutive deliveries of a given message. Current default '600 seconds' = 10 minutes. "
+  type        = number
+  default     = 600
+  validation {
+    condition     = (var.default_maximum_backoff >= 0) && (var.default_maximum_backoff <= 600)
+    error_message = "Must be an integer between 0 to 600."
+  }
+}
