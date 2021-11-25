@@ -73,6 +73,10 @@ resource "google_pubsub_subscription" "push_subscriptions" {
     }
   }
   expiration_policy { ttl = local.push_subscriptions[count.index]["expiry_ttl"] }
+  retry_policy {
+    minimum_backoff = local.push_subscriptions[count.index]["minimum_backoff"]
+    maximum_backoff = local.push_subscriptions[count.index]["maximum_backoff"]
+  }
   depends_on = [google_project_service.pubsub_api]
 }
 
