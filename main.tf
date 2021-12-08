@@ -8,8 +8,6 @@ locals {
   google_pubsub_sa_email  = "service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
   default_expiry_ttl      = var.default_expiry_ttl == "NEVER" ? "" : var.default_expiry_ttl
   topic_name              = format("%s-%s", var.topic_name, var.name_suffix)
-  default_minimum_backoff = var.default_minimum_backoff
-  default_maximum_backoff = var.default_maximum_backoff
   push_subscriptions = [
     for subscription in var.push_subscriptions :
     {
@@ -23,8 +21,8 @@ locals {
       message_retention_duration = lookup(subscription, "message_retention_duration", var.default_message_retention_duration)
       expiry_ttl                 = lookup(subscription, "expiry_ttl", local.default_expiry_ttl)
       filter                     = lookup(subscription, "filter", "")
-      minimum_backoff            = lookup(subscription, "minimum_backoff", local.default_minimum_backoff)
-      maximum_backoff            = lookup(subscription, "maximum_backoff", local.default_maximum_backoff)
+      minimum_backoff            = lookup(subscription, "minimum_backoff", var.default_minimum_backoff)
+      maximum_backoff            = lookup(subscription, "maximum_backoff", var.default_maximum_backoff)
     }
   ]
   pull_subscriptions = [
@@ -35,8 +33,8 @@ locals {
       message_retention_duration = lookup(subscription, "message_retention_duration", var.default_message_retention_duration)
       expiry_ttl                 = lookup(subscription, "expiry_ttl", local.default_expiry_ttl)
       filter                     = lookup(subscription, "filter", "")
-      minimum_backoff            = lookup(subscription, "minimum_backoff", local.default_minimum_backoff)
-      maximum_backoff            = lookup(subscription, "maximum_backoff", local.default_maximum_backoff)
+      minimum_backoff            = lookup(subscription, "minimum_backoff", var.default_minimum_backoff)
+      maximum_backoff            = lookup(subscription, "maximum_backoff", var.default_maximum_backoff)
     }
   ]
 }
