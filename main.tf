@@ -5,9 +5,9 @@ terraform {
 data "google_project" "project" {}
 
 locals {
-  google_pubsub_sa_email  = "service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
-  default_expiry_ttl      = var.default_expiry_ttl == "NEVER" ? "" : var.default_expiry_ttl
-  topic_name              = format("%s-%s", var.topic_name, var.name_suffix)
+  google_pubsub_sa_email = "service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+  default_expiry_ttl     = var.default_expiry_ttl == "NEVER" ? "" : var.default_expiry_ttl
+  topic_name             = format("%s-%s", var.topic_name, var.name_suffix)
   push_subscriptions = [
     for subscription in var.push_subscriptions :
     {
