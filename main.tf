@@ -8,8 +8,8 @@ locals {
   google_pubsub_sa_email  = "service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
   default_expiry_ttl      = var.default_expiry_ttl == "NEVER" ? "" : var.default_expiry_ttl
   topic_name              = format("%s-%s", var.topic_name, var.name_suffix)
-  default_minimum_backoff = var.default_minimum_backoff == "10s" ? "" : var.default_minimum_backoff
-  default_maximum_backoff = var.default_maximum_backoff == "600s" ? "" : var.default_maximum_backoff
+  default_minimum_backoff = var.default_minimum_backoff
+  default_maximum_backoff = var.default_maximum_backoff
   push_subscriptions = [
     for subscription in var.push_subscriptions :
     {
