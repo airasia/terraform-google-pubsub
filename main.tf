@@ -3,6 +3,7 @@ terraform {
 }
 
 data "google_project" "project" {}
+data "google_client_config" "google_client" {}
 
 locals {
   google_pubsub_sa_email = "service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
@@ -101,6 +102,7 @@ resource "google_project_iam_member" "pubsub_sa_create_oidc_token" {
   # GCP requires the iam.serviceAccountTokenCreator role to be granted
   # on a special ServiceAccount maintained by GCP for PubSub push authentication to work.
   # See https://cloud.google.com/pubsub/docs/push#setting_up_for_push_authentication
+  project    = data.google_client_config.google_client.project
   role       = "roles/iam.serviceAccountTokenCreator"
   member     = "serviceAccount:${local.google_pubsub_sa_email}"
   depends_on = [google_project_service.pubsub_api]
@@ -108,6 +110,7 @@ resource "google_project_iam_member" "pubsub_sa_create_oidc_token" {
 
 # See https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/pubsub_subscription#dead_letter_policy
 resource "google_project_iam_member" "pubsub_sa_acknowledge_for_dead_letter" {
+  project    = data.google_client_config.google_client.project
   role       = "roles/pubsub.subscriber"
   member     = "serviceAccount:${local.google_pubsub_sa_email}"
   depends_on = [google_project_service.pubsub_api]
@@ -115,6 +118,7 @@ resource "google_project_iam_member" "pubsub_sa_acknowledge_for_dead_letter" {
 
 # See https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/pubsub_subscription#dead_letter_topic
 resource "google_project_iam_member" "pubsub_sa_publish_to_dead_letter" {
+  project    = data.google_client_config.google_client.project
   role       = "roles/pubsub.publisher"
   member     = "serviceAccount:${local.google_pubsub_sa_email}"
   depends_on = [google_project_service.pubsub_api]
