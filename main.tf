@@ -38,6 +38,22 @@ locals {
       maximum_backoff            = lookup(subscription, "maximum_backoff", var.default_maximum_backoff)
     }
   ]
+  bigquery_subscriptions = [
+    for subscription in var.bigquery_subscriptions :
+    {
+      name                       = format("%s-%s-bq-%s", var.topic_name, subscription.name, var.name_suffix)
+      table                      = subscription.table
+      use_topic_schema           = lookup(subscription, "use_topic_schema", false)
+      write_metadata             = lookup(subscription, "write_metadata", false)
+      drop_unknown_fields        = lookup(subscription, "drop_unknown_fields", false)
+      ack_deadline_seconds       = lookup(subscription, "ack_deadline_seconds", var.default_ack_deadline_seconds)
+      message_retention_duration = lookup(subscription, "message_retention_duration", var.default_message_retention_duration)
+      expiry_ttl                 = lookup(subscription, "expiry_ttl", local.default_expiry_ttl)
+      filter                     = lookup(subscription, "filter", "")
+      minimum_backoff            = lookup(subscription, "minimum_backoff", var.default_minimum_backoff)
+      maximum_backoff            = lookup(subscription, "maximum_backoff", var.default_maximum_backoff)
+    }
+  ]
 }
 
 resource "google_project_service" "pubsub_api" {
@@ -94,6 +110,27 @@ resource "google_pubsub_subscription" "pull_subscriptions" {
   retry_policy {
     minimum_backoff = local.pull_subscriptions[count.index]["minimum_backoff"]
     maximum_backoff = local.pull_subscriptions[count.index]["maximum_backoff"]
+  }
+  depends_on = [google_project_service.pubsub_api]
+}
+
+resource "google_pubsub_subscription" "bigquery_subscriptions" {
+  count                      = length(local.bigquery_subscriptions)
+  name                       = local.bigquery_subscriptions[count.index].name
+  topic                      = google_pubsub_topic.topic.name
+  ack_deadline_seconds       = local.bigquery_subscriptions[count.index]["ack_deadline_seconds"]
+  message_retention_duration = local.bigquery_subscriptions[count.index]["message_retention_duration"]
+  filter                     = local.bigquery_subscriptions[count.index].filter
+  bigquery_config {
+    table               = local.bigquery_subscriptions[count.index]["table"]
+    use_topic_schema    = local.bigquery_subscriptions[count.index]["use_topic_schema"]
+    write_metadata      = local.bigquery_subscriptions[count.index]["write_metadata"]
+    drop_unknown_fields = local.bigquery_subscriptions[count.index]["drop_unknown_fields"]
+  }
+  expiration_policy { ttl = local.bigquery_subscriptions[count.index]["expiry_ttl"] }
+  retry_policy {
+    minimum_backoff = local.bigquery_subscriptions[count.index]["minimum_backoff"]
+    maximum_backoff = local.bigquery_subscriptions[count.index]["maximum_backoff"]
   }
   depends_on = [google_project_service.pubsub_api]
 }
