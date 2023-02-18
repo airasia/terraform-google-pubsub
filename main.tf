@@ -38,7 +38,7 @@ locals {
       maximum_backoff            = lookup(subscription, "maximum_backoff", var.default_maximum_backoff)
     }
   ]
-  bigquery_subscriptions = [
+  bigquery_subscriptions = flatten([
     for subscription in var.bigquery_subscriptions :
     {
       name                       = format("%s-%s-bq-%s", var.topic_name, subscription.name, var.name_suffix)
@@ -53,7 +53,7 @@ locals {
       minimum_backoff            = lookup(subscription, "minimum_backoff", var.default_minimum_backoff)
       maximum_backoff            = lookup(subscription, "maximum_backoff", var.default_maximum_backoff)
     }
-  ]
+  ])
 }
 
 resource "google_project_service" "pubsub_api" {
@@ -115,22 +115,22 @@ resource "google_pubsub_subscription" "pull_subscriptions" {
 }
 
 resource "google_pubsub_subscription" "bigquery_subscriptions" {
-  count                      = length(local.bigquery_subscriptions)
-  name                       = local.bigquery_subscriptions[count.index].name
+  for_each                   = { for obj in local.bigquery_subscriptions : obj.name => obj }
+  name                       = each.value.name
   topic                      = google_pubsub_topic.topic.name
-  ack_deadline_seconds       = local.bigquery_subscriptions[count.index]["ack_deadline_seconds"]
-  message_retention_duration = local.bigquery_subscriptions[count.index]["message_retention_duration"]
-  filter                     = local.bigquery_subscriptions[count.index].filter
+  ack_deadline_seconds       = each.value["ack_deadline_seconds"]
+  message_retention_duration = each.value["message_retention_duration"]
+  filter                     = each.value.filter
   bigquery_config {
-    table               = local.bigquery_subscriptions[count.index]["table"]
-    use_topic_schema    = local.bigquery_subscriptions[count.index]["use_topic_schema"]
-    write_metadata      = local.bigquery_subscriptions[count.index]["write_metadata"]
-    drop_unknown_fields = local.bigquery_subscriptions[count.index]["drop_unknown_fields"]
+    table               = each.value["table"]
+    use_topic_schema    = each.value["use_topic_schema"]
+    write_metadata      = each.value["write_metadata"]
+    drop_unknown_fields = each.value["drop_unknown_fields"]
   }
-  expiration_policy { ttl = local.bigquery_subscriptions[count.index]["expiry_ttl"] }
+  expiration_policy { ttl = each.value["expiry_ttl"] }
   retry_policy {
-    minimum_backoff = local.bigquery_subscriptions[count.index]["minimum_backoff"]
-    maximum_backoff = local.bigquery_subscriptions[count.index]["maximum_backoff"]
+    minimum_backoff = each.value["minimum_backoff"]
+    maximum_backoff = each.value["maximum_backoff"]
   }
   depends_on = [google_project_service.pubsub_api]
 }
