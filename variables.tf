@@ -28,6 +28,12 @@ variable "pull_subscriptions" {
   default     = []
 }
 
+variable "bigquery_subscriptions" {
+  description = "List of bigquery subscriptions (if any) with key-value configurations. See source code for accepted keys of the configuration."
+  type        = list(map(string))
+  default     = []
+}
+
 # ----------------------------------------------------------------------------------------------------------------------
 # OPTIONAL PARAMETERS
 # ----------------------------------------------------------------------------------------------------------------------
