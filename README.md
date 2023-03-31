@@ -33,3 +33,16 @@ pull_subscriptions = [
   }
 ]
 ```
+
+# BigQuery Subscriptions
+
+The `bigquery_subscriptions` variable accepts a list of bigquery subscriber configurations. PubSub will write messages to an existing BigQuery table as they are received.
+
+```terraform
+bigquery_subscriptions = [
+  {
+    name  = "Just any name"
+    table = "The name of the table to which to write data from pubsub."
+  }
+]
+```
