@@ -44,6 +44,7 @@ locals {
       name                       = format("%s-%s-bq-%s", var.topic_name, subscription.name, var.name_suffix)
       table                      = subscription.table
       use_topic_schema           = lookup(subscription, "use_topic_schema", false)
+      use_table_schema           = lookup(subscription, "use_table_schema", false)
       write_metadata             = lookup(subscription, "write_metadata", false)
       drop_unknown_fields        = lookup(subscription, "drop_unknown_fields", false)
       ack_deadline_seconds       = lookup(subscription, "ack_deadline_seconds", var.default_ack_deadline_seconds)
@@ -124,6 +125,7 @@ resource "google_pubsub_subscription" "bigquery_subscriptions" {
   bigquery_config {
     table               = each.value["table"]
     use_topic_schema    = each.value["use_topic_schema"]
+    use_table_schema    = each.value["use_table_schema"]
     write_metadata      = each.value["write_metadata"]
     drop_unknown_fields = each.value["drop_unknown_fields"]
   }
