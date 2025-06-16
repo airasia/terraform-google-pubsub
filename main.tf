@@ -24,8 +24,7 @@ locals {
       filter                     = lookup(subscription, "filter", "")
       minimum_backoff            = lookup(subscription, "minimum_backoff", var.default_minimum_backoff)
       maximum_backoff            = lookup(subscription, "maximum_backoff", var.default_maximum_backoff)
-      no_wrapper_enabled         = lookup(subscription, "no_wrapper_enabled", false)
-      write_metadata             = no_wrapper_enabled ? lookup(subscription, "write_metadata", false) : null
+      no_wrapper_enabled         = contains(keys(sub), "write_metadata")
     }
   ]
   pull_subscriptions = [
