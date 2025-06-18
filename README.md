@@ -14,7 +14,7 @@ push_subscriptions = [
     ack_deadline_seconds       = "Overrides 'var.default_ack_deadline_seconds' for this subscriber"
     message_retention_duration = "Overrides 'var.default_message_retention_duration' for this subscriber"
     expiry_ttl                 = "Overrides 'var.default_expiry_ttl' for this subscriber"
-    write_metadata             = "(Optional) When set, determines whether the payload to the push endpoint is to be wrapped"
+    no_wrapper_write_metadata  = "(Optional) When set, determines whether the payload to the push endpoint is to be wrapped"
   }
 ]
 ```
