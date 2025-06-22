@@ -84,7 +84,8 @@ resource "google_pubsub_subscription" "push_subscriptions" {
   push_config {
     push_endpoint = local.push_subscriptions[count.index]["push_endpoint"]
     dynamic "no_wrapper" {
-      for_each = contains(keys(local.push_subscriptions[count.index]), "no_wrapper_write_metadata") ? [1] : []
+      # add this block only if 'no_wrapper_write_metadata' is present for this subscription
+      for_each = local.push_subscriptions[count.index]["no_wrapper_write_metadata"] == null ? [] : [1]
       content {
         write_metadata = local.push_subscriptions[count.index]["no_wrapper_write_metadata"]
       }
