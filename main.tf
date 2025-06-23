@@ -24,6 +24,7 @@ locals {
       filter                     = lookup(subscription, "filter", "")
       minimum_backoff            = lookup(subscription, "minimum_backoff", var.default_minimum_backoff)
       maximum_backoff            = lookup(subscription, "maximum_backoff", var.default_maximum_backoff)
+      no_wrapper_write_metadata  = lookup(subscription, "no_wrapper_write_metadata", null)
     }
   ]
   pull_subscriptions = [
@@ -82,6 +83,13 @@ resource "google_pubsub_subscription" "push_subscriptions" {
   }
   push_config {
     push_endpoint = local.push_subscriptions[count.index]["push_endpoint"]
+    dynamic "no_wrapper" {
+      # add this block only if 'no_wrapper_write_metadata' is present for this subscription
+      for_each = local.push_subscriptions[count.index]["no_wrapper_write_metadata"] == null ? [] : [1]
+      content {
+        write_metadata = local.push_subscriptions[count.index]["no_wrapper_write_metadata"]
+      }
+    }
     dynamic "oidc_token" {
       # add this block only if 'auth_sa_email' is present for this subscription
       for_each = local.push_subscriptions[count.index]["auth_sa_email"] == null ? [] : [1]
