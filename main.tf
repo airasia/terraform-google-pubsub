@@ -18,6 +18,7 @@ locals {
       auth_audience              = lookup(subscription, "auth_audience", null)
       dead_letter_topic          = lookup(subscription, "dead_letter_topic", null)
       dead_letter_max_attempts   = lookup(subscription, "dead_letter_max_attempts", var.default_dead_letter_max_attempts)
+      enable_message_ordering    = lookup(subscription, "enable_message_ordering", false)
       ack_deadline_seconds       = lookup(subscription, "ack_deadline_seconds", var.default_ack_deadline_seconds)
       message_retention_duration = lookup(subscription, "message_retention_duration", var.default_message_retention_duration)
       expiry_ttl                 = lookup(subscription, "expiry_ttl", local.default_expiry_ttl)
@@ -31,6 +32,7 @@ locals {
     for subscription in var.pull_subscriptions :
     {
       name                       = format("%s-%s-pull-%s", var.topic_name, subscription.name, var.name_suffix)
+      enable_message_ordering    = lookup(subscription, "enable_message_ordering", false)
       ack_deadline_seconds       = lookup(subscription, "ack_deadline_seconds", var.default_ack_deadline_seconds)
       message_retention_duration = lookup(subscription, "message_retention_duration", var.default_message_retention_duration)
       expiry_ttl                 = lookup(subscription, "expiry_ttl", local.default_expiry_ttl)
@@ -47,6 +49,7 @@ locals {
       use_topic_schema           = lookup(subscription, "use_topic_schema", false)
       write_metadata             = lookup(subscription, "write_metadata", false)
       drop_unknown_fields        = lookup(subscription, "drop_unknown_fields", false)
+      enable_message_ordering    = lookup(subscription, "enable_message_ordering", false)
       ack_deadline_seconds       = lookup(subscription, "ack_deadline_seconds", var.default_ack_deadline_seconds)
       message_retention_duration = lookup(subscription, "message_retention_duration", var.default_message_retention_duration)
       expiry_ttl                 = lookup(subscription, "expiry_ttl", local.default_expiry_ttl)
@@ -71,6 +74,7 @@ resource "google_pubsub_subscription" "push_subscriptions" {
   count                      = length(local.push_subscriptions)
   name                       = local.push_subscriptions[count.index].name
   topic                      = google_pubsub_topic.topic.name
+  enable_message_ordering    = local.push_subscriptions[count.index]["enable_message_ordering"]
   ack_deadline_seconds       = local.push_subscriptions[count.index]["ack_deadline_seconds"]
   message_retention_duration = local.push_subscriptions[count.index]["message_retention_duration"]
   filter                     = local.push_subscriptions[count.index].filter
@@ -111,6 +115,7 @@ resource "google_pubsub_subscription" "pull_subscriptions" {
   count                      = length(local.pull_subscriptions)
   name                       = local.pull_subscriptions[count.index].name
   topic                      = google_pubsub_topic.topic.name
+  enable_message_ordering    = local.pull_subscriptions[count.index]["enable_message_ordering"]
   ack_deadline_seconds       = local.pull_subscriptions[count.index]["ack_deadline_seconds"]
   message_retention_duration = local.pull_subscriptions[count.index]["message_retention_duration"]
   filter                     = local.pull_subscriptions[count.index].filter
@@ -126,6 +131,7 @@ resource "google_pubsub_subscription" "bigquery_subscriptions" {
   for_each                   = { for obj in local.bigquery_subscriptions : obj.name => obj }
   name                       = each.value.name
   topic                      = google_pubsub_topic.topic.name
+  enable_message_ordering    = each.value["enable_message_ordering"]
   ack_deadline_seconds       = each.value["ack_deadline_seconds"]
   message_retention_duration = each.value["message_retention_duration"]
   filter                     = each.value.filter
